@@ -1,7 +1,7 @@
 # city-explorer-api
 
 **Author**: Dan Quinn
-**Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)
+**Version**: 1.0.2 (increment the patch/fix version number if you make more commits past your first submission)
 
 ## Overview
 This is and advanced API that updated my city explorer site with weather information.
@@ -22,6 +22,7 @@ I am going to use javascript components that get data from storage and use them 
 
 05-16-2023 1:50 - Project start
 05-16-2023 8:02 - Deployed to netlify
+05-16-2023 9:02 - Deployed to netlify with api
 
 <!-- Use this area to document the iterative changes made to your application as each feature is successfully implemented. Use time stamps. Here's an example:
 
@@ -53,23 +54,23 @@ Actual time needed to complete: 1
 
 Name of feature: Weather Placeholder
 
-Estimate of time needed to complete: 1 hour
+Estimate of time needed to complete: 2 hour
 
 Start time: 2
 
-Finish time: 7
+Finish time: 9
+
+Actual time needed to complete: 7
 
 Name of feature: Error message
 
-Actual time needed to complete: 1
-
 Estimate of time needed to complete: 1 hour
 
-Start time: 7
+Start time: 
 
-Finish time: 8
+Finish time: 
 
-Actual time needed to complete: 1.5
+Actual time needed to complete: went to bed
 
 
 
