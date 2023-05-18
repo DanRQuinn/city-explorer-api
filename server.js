@@ -1,120 +1,118 @@
-import React from 'react';
-import axios from 'axios';
-import { Card } from 'react-bootstrap';
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css'
-import Button from 'react-bootstrap/Button'
-import Weather from './Weather.js'
+'use strict';
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      cityName: '',
-      cityData: {},
-      haveCityData: false,
-      error: false,
-      errorMessage: '',
-      weatherData: [],
-      lat: '',
-      lon: ''
-    }
+//  REQUIRE
+
+require('dotenv').config();
+// let data = require('./data/weather.json');
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+
+//USE
+
+const app = express();
+
+
+//  PORT
+
+app.use(cors());
+const PORT = process.env.PORT || 3002;
+
+// ROUTES
+
+app.get('/weather', async (request, response, next) => {
+  try {
+    // console.log(request.query.cityData)
+    // let { lat, lon } = request.query;
+    // let searchQuery = request.query.cityData
+
+    let url = `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&units=I&days=5&lat=${request.query.lat}&lon=${request.query.lon}`
+    let weatherData = await axios.get(url);
+
+    let weatherMap = parseWeathers(weatherData.data);
+    weatherMap.then(weather => {
+      response.status(200).send(weather);
+    })
+
+  } catch (error) {
+    next(error);
   }
+});
 
-  // WHEN DEALING WITH AXIOS YOU NEED 3 things:
-  // - 1) async
-  // - 2) await
-  // - 3) .data
-  handleCitySubmit = async (event) => {
-    event.preventDefault();
-    try {
-      let cityUrl = `https://us1.locationiq.com/v1/search?key=${process.env.REACT_APP_LOCATIONIQ_API_KEY}&q=${this.state.cityName}&format=json`;
-      let city = await axios.get(cityUrl);
-      this.setState({
-        Data1: city.data[0],
-        error: false,
-        haveCityData: true,
-        lat: city.data[0].lat,
-        lon: city.data[0].lon
-      });
-      this.getWeather(city.data[0].lat, city.data[0].lon);
-    }
-    catch (error) {
-      console.log('error: ', error);
-      console.log('error.message: ', error.message);
-      this.setState({
-        error: true,
-        errorMessage: `An error Occured: ${error.response.status}`
-      });
-    }
+app.get('/movies', async (request, response, next) => {
+  try {
+    console.log("request querey hERE: ", request.query);
+    let city = request.query.cityName;
+    let movieURL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${city}`
+    let movieData = await axios.get(movieURL);
+    // console.log("movieDATA HERE: ", movieData.data.results);
+
+    let movieMap = parseMovies(movieData.data.results);
+    console.log("HERE MOVIES: ", movieMap);
+    movieMap.then(movie => {
+      response.status(200).send(movie);
+    })
+
+  } catch (error) {
+    console.log('HERE: ', error);
+    next(error)
   }
+});
 
-  getWeather = async (lat, lon) => {
-    try {
-      // let { lat, lon } = this.state.Data1;
-      let weatherUrl = `${process.env.REACT_APP_SERVER}/weather?cityData=${this.state.cityName}&lat=${lat}&lon=${lon}`;
-      let weatherResponse = await axios.get(weatherUrl);
-      // console.log(weatherResponse.data)
-      let weatherData = weatherResponse.data;
-      // let date = new Date(weatherData.dt * 1000).toLocaleDateString();
-      // let description = weatherData[0].description;
-      this.setState({
-        weatherData
-      })
-      // console.log('Date:', date);
-      // console.log('Description:', description);
-    } catch (error) {
-      console.log('Error getting weather: ', error);
-    }
-  };
-
-
-  changeCityInput = (e) => {
-    this.setState({
-      cityName: e.target.value
+function parseWeathers(weatherData) {
+  try {
+    const weatherSummarize = weatherData.data.map(oneDay => {
+      return new Forecast(oneDay);
     });
-  }
-  render() {
-    // console.log(this.state.weatherData)
-    return (
-      <>
-        <header>
-          <h1>Data from an API</h1>
-          <form onSubmit={this.handleCitySubmit}>
-            <label>
-              <input name="city" onChange={this.changeCityInput} />
-            </label>
-            <Button type="submit" className="button">Explore!</Button>
-          </form>
-        </header>
-        {this.state.error ? <p>{this.state.errorMessage}</p> :
-          this.state.haveCityData &&
-          <main>
-            <Card className='City p-2 h-100%' style={{ width: '75%' }}>
-              <Card.Body>
-                <Card.Img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_API_KEY}&center=${this.state.Data1.lat},${this.state.Data1.lon}&zoom=12`} alt="" />
-                <Card.Title>{this.state.cityName}</Card.Title>
-                <Card.Text>Lat: {this.state.Data1.lat}</Card.Text>
-                <Card.Text>Lon: {this.state.Data1.lon}</Card.Text>
-                {this.state.weatherData.length > 0 && <Weather
-                  weatherData={this.state.weatherData}
-                  cityName={this.state.cityName}
-                />}
-              </Card.Body>
-            </Card>
-            {/* {this.state.weatherData ? (
-              this.state.weatherData.map(day => (
-                <h1>{day.date}</h1>
-              ))
-            ) : (
-              <p>loading weather data</p>
-            )
-            } */}
-          </main>
-        }
-      </>
-    );
+    return Promise.resolve(weatherSummarize);
+  } catch (error) {
+    return Promise.reject(error);
   }
 }
 
-export default App;
+function parseMovies(moviesData) {
+  // console.log("movdiesDATA HERE: ", moviesData);
+  try {
+    const movieSummarize = moviesData.map(oneMovie => {
+      return new Movies(oneMovie);
+    });
+    return Promise.resolve(movieSummarize);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+
+
+// TRUST SHEYNA IT WORKS
+
+app.get('*', (request, response) => {
+  response.send('The thing you are looking for doesn\'t exist');
+});
+
+// CLASSES
+
+class Forecast {
+  constructor(day) {
+    this.date = day.valid_date;
+    this.description = day.weather.description;
+    this.high = day.high_temp;
+    this.low = day.low_temp;
+  }
+}
+
+class Movies {
+  constructor(movie) {
+    this.title = movie.original_title;
+    this.overview = movie.overview;
+    this.averageVotes = movie.vote_average;
+    this.totalVotes = movie.vote_count;
+    this.image_url = movie.poster_path;
+    this.popularity = movie.popularity;
+    this.releaseDate = movie.release_date;
+  }
+}
+
+// LISTEN 
+
+app.listen(PORT, () => console.log(`listening on ${PORT}`));
