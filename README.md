@@ -39,6 +39,9 @@ Tuesday:
 Tiffani Rice
 ![WB-1](./tiffifani.png)
 
+Wednesday:
+![WB-3](./apiday4.png)
+
 ## Time Estimates
 For each of the lab features, make an estimate of the time it will take you to complete the feature, and record your start and finish times for that feature:
 
