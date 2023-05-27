@@ -17,7 +17,7 @@ const app = express();
 //  PORT
 
 app.use(cors());
-// const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3002;
 
 // ROUTES
 
@@ -29,7 +29,7 @@ app.use(cors());
 
 app.get('/weather', handleGetWeather);
 app.get('/movies', handleGetMovies);
-
+// PORT='http://localhost3001';
 // TRUST SHEYNA IT WORKS
 
 // app.get('*', (request, response) => {
